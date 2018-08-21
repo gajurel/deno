@@ -91,7 +91,6 @@ export class FileModule {
   }
 
   compileAndRun(): void {
-    util.log("compileAndRun", this.sourceCode);
     if (!this.outputCode) {
       // If there is no cached outputCode, then compile the code.
       util.assert(
