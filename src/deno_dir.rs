@@ -110,15 +110,19 @@ impl DenoDir {
     module_name: &str,
     filename: &str,
   ) -> std::io::Result<String> {
-    let filepath = Path::new(filename);
-    if !self.reload && filepath.exists() {
-      fs::read_file_sync_string(&filepath)
-    } else {
+    let p = Path::new(filename);
+
+    if self.reload || !p.exists() {
       println!("Downloading {}", module_name);
-      net::fetch_sync_string(module_name).and_then(|res| {
-        fs::write_file_sync(&filepath, res.as_bytes());
-        Ok(res)
-      })
+      let source = net::fetch_sync_string(module_name)?;
+      match p.parent() {
+        Some(ref parent) => std::fs::create_dir_all(parent),
+        None => Ok(()),
+      }?;
+      fs::write_file_sync(&p, source.as_bytes())?;
+      Ok(source)
+    } else {
+      fs::read_file_sync_string(&p)
     }
   }
 

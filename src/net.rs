@@ -16,9 +16,7 @@ pub fn fetch_sync_string(module_name: &str) -> std::io::Result<String> {
   let result = rt.block_on(
     client
       .get(url)
-      .and_then(move |response| {
-        response.into_body().concat2()
-      })
+      .and_then(move |response| response.into_body().concat2()),
   );
   let body = result.unwrap();
   return Ok(String::from_utf8(body.to_vec()).unwrap());
